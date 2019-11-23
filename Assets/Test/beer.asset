@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7512ef1992c2de3419de50dba463641c, type: 3}
+  m_Name: beer
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 21300000, guid: dc8458ff11b060f4792e1f906136db88, type: 3}
+  song: {fileID: 8300000, guid: aee3099f7c4cd7d4f96e4e54e749c43a, type: 3}
+  images:
+  - {fileID: 21300000, guid: 935e2cde1f318344583e861cfea9160c, type: 3}
+  - {fileID: 21300000, guid: 7b64234f7c3390e46b7112c8cae645ec, type: 3}
+  - {fileID: 21300000, guid: dc8458ff11b060f4792e1f906136db88, type: 3}

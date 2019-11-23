@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7512ef1992c2de3419de50dba463641c, type: 3}
+  m_Name: kat
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 21300000, guid: d8b4b1399467fe34fad065544fb8f476, type: 3}
+  song: {fileID: 8300000, guid: 459c9077e9a634b4b9b4e0f8ef1cd6e5, type: 3}
+  images:
+  - {fileID: 21300000, guid: afee81d6d7691bc4ba7bcc0bababade8, type: 3}
+  - {fileID: 21300000, guid: 9dd8ccbc7b314254b8a59726fc73849c, type: 3}
+  - {fileID: 21300000, guid: efb0ce7f235048c40a33473963f82099, type: 3}
