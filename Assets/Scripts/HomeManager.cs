@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HomeManager : MonoBehaviour
@@ -31,6 +32,7 @@ public class HomeManager : MonoBehaviour
     public GameObject spelImage3;
 
     public AudioClip buttonEffectClip;
+    public GameObject addContentButton;
 
 
     private void CreateScriptableObjectsFromLiedjes()
@@ -46,15 +48,22 @@ public class HomeManager : MonoBehaviour
         {
             if (Directory.Exists(folder))
             {
-                Song tempSong = ProcessDirectory(folder);
-                songs.Add(tempSong);
+                StartCoroutine(ProcessDirectory(folder));
+
                 //code uitvoeren zet alles om naar een scriptobject en zet om naar een lijst
             }
         }
+        UpdateUI();
 
     }
 
-    private Song ProcessDirectory(string folder)
+    public void LoadAddSongsScene()
+    {
+        SceneManager.LoadScene("AddContent");
+    }
+
+
+    private IEnumerator ProcessDirectory(string folder)
     {
         Song tempSong = ScriptableObject.CreateInstance<Song>();
         tempSong.images = new List<Sprite>();
@@ -64,9 +73,14 @@ public class HomeManager : MonoBehaviour
             Debug.Log(file);
             if (file.EndsWith(".mp3"))
             {
-                //tempSong.song = Resources.Load<AudioClip>(file.);
+                //SONG
+                using (var www = new WWW(file))
+                {
+                    yield return www;
+                    tempSong.song = www.GetAudioClip();
+                }
             }
-            else if (file.EndsWith(".png"))
+            else if (file.EndsWith(".png") || file.EndsWith(".jpg"))
             {
                 if (file.ToLower().Contains("menuicon"))
                 {
@@ -79,26 +93,20 @@ public class HomeManager : MonoBehaviour
                 tempSong.images.Add(IMG2Sprite.ConvertTextureToSprite(tempTexture2DIcon));
             }
         }
-        return tempSong;
+        songs.Add(tempSong);
+        UpdateUI();
     }
 
-    private IEnumerator LoadAssetFromFile(string file, Song song)
-    {
-        using (var www = new WWW(file))
-        {
-            yield return www;
-            song.song = www.GetAudioClip();
-        }
-    }
+
 
     private void Awake()
     {
         Input.multiTouchEnabled = false;
         //EERST SONGS LIST OPBOUWEN DOOR MAPSTRUCTUUR MET LIEDJES AF TE GAAN
-
+        CreateScriptableObjectsFromLiedjes();
         //CreateScriptableObjectsFromLiedjes();
 
-        audioSource.clip = songs[0].song;
+        //audioSource.clip = songs[0].song;
         Debug.Log("");
         //audioSource.Play();
 
@@ -107,7 +115,9 @@ public class HomeManager : MonoBehaviour
     void Start()
     {
         //UPDATE UI MET EERSTE 2 LIEDJES UIT LIST
-        UpdateUI();
+
+
+
     }
 
     // Update is called once per frame
@@ -121,14 +131,15 @@ public class HomeManager : MonoBehaviour
                 DisableGameUI();
             }
         }
-        
+
     }
 
     private void StartGame(Song selectedSong)
     {
         bool started = false;
-        if(started == false)
+        if (started == false)
         {
+            //SPELVORM
             spelImage1.transform.localPosition = Vector3.Lerp(new Vector2(-1600, 0), new Vector2(1200, 0), Mathf.PingPong(Time.time * 0.2f, 1.0f));
             spelImage2.transform.localPosition = Vector3.Lerp(new Vector2(1600, 200), new Vector2(-1600, 200), Mathf.PingPong(Time.time * 0.2f, 1.0f));
             spelImage3.transform.localPosition = Vector3.Lerp(new Vector2(0, -1200), new Vector2(0, 1200), Mathf.PingPong(Time.time * 0.05f, 1.0f));
@@ -144,6 +155,7 @@ public class HomeManager : MonoBehaviour
         imageRight.SetActive(true);
         buttonLeft.SetActive(true);
         buttonRight.SetActive(true);
+        addContentButton.SetActive(true);
         buttonReturnToList.SetActive(false);
         playGame = false;
         spelImage1.SetActive(false);
@@ -157,6 +169,7 @@ public class HomeManager : MonoBehaviour
         imageRight.SetActive(false);
         buttonLeft.SetActive(false);
         buttonRight.SetActive(false);
+        addContentButton.SetActive(false);
         buttonReturnToList.SetActive(true);
         spelImage1.SetActive(true);
         spelImage2.SetActive(true);
@@ -182,22 +195,26 @@ public class HomeManager : MonoBehaviour
         PlaySound(songs[indexInList + 1].song);
         selectedSong = songs[indexInList + 1];
         EnableGameUI();
-        
+
     }
 
 
     public void PlaySound(AudioClip clipSong)
     {
         audioSource.clip = clipSong;
-        Debug.Log("Playing " + clipSong.name);
+        //Debug.Log("Playing " + clipSong.name);
         audioSource.Play();
     }
 
     public void UpdateUI()
     {
-        GameObject.FindGameObjectWithTag("Image1").GetComponent<Image>().sprite = songs[indexInList].sprite;
+        if (songs.Count > 1)
+        {
+            GameObject.FindGameObjectWithTag("Image1").GetComponent<Image>().sprite = songs[indexInList].sprite;
 
-        GameObject.FindGameObjectWithTag("Image2").GetComponent<Image>().sprite = songs[indexInList + 1].sprite;
+
+            GameObject.FindGameObjectWithTag("Image2").GetComponent<Image>().sprite = songs[indexInList + 1].sprite;
+        }
     }
 
 
@@ -236,7 +253,7 @@ public class HomeManager : MonoBehaviour
         audioSource.clip = buttonEffectClip;
         audioSource.Play();
         Debug.Log("Go right in list");
-        if(indexInList == songs.Count-1 || indexInList == songs.Count - 2)
+        if (indexInList == songs.Count - 1 || indexInList == songs.Count - 2)
         {
             indexInList = 0;
             UpdateUI();
