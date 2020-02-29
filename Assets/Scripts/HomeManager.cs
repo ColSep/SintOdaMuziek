@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,6 +35,11 @@ public class HomeManager : MonoBehaviour
     public AudioClip buttonEffectClip;
     public GameObject addContentButton;
 
+    float buttonTimer = 0f;
+    Stopwatch stopWatch = new Stopwatch();
+
+    private int clicked = 0;
+    public GameObject clickedText;
 
     private void CreateScriptableObjectsFromLiedjes()
     {
@@ -42,7 +48,26 @@ public class HomeManager : MonoBehaviour
         //HOOFDMAP = SONGS
 
         //CREATE SCRIPTABLE OBJECTAND SAVE
-        string[] folders = Directory.GetDirectories(Application.dataPath + "/Resources/Liedjes");
+        string[] folders = null;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            UnityEngine.Debug.Log("ANDROID FILE PATH:" + Application.persistentDataPath);
+            UnityEngine.Debug.Log("ANDROID FILE streamingPATH:" + Application.streamingAssetsPath);
+            //folders = Directory.GetDirectories(Application.streamingAssetsPath);
+            DirectoryInfo directoryInfo = new DirectoryInfo(Application.streamingAssetsPath);
+            
+            //folders = directoryInfo.GetDirectories();
+            UnityEngine.Debug.Log("ANDROID files:" + folders.Length);
+        }
+        else if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            folders = Directory.GetDirectories(Application.dataPath + "/Resources/Liedjes");
+        }
+        else if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            folders = Directory.GetDirectories(Application.dataPath + "/Resources/Liedjes");
+        }
+
 
         foreach (var folder in folders)
         {
@@ -59,6 +84,8 @@ public class HomeManager : MonoBehaviour
 
     public void LoadAddSongsScene()
     {
+        //timer starten ++ if timer is 10 => doen
+        stopWatch.Start();
         SceneManager.LoadScene("AddContent");
     }
 
@@ -70,7 +97,7 @@ public class HomeManager : MonoBehaviour
         string[] files = Directory.GetFiles(folder);
         foreach (var file in files)
         {
-            Debug.Log(file);
+            UnityEngine.Debug.Log(file);
             if (file.EndsWith(".mp3"))
             {
                 //SONG
@@ -97,6 +124,11 @@ public class HomeManager : MonoBehaviour
         UpdateUI();
     }
 
+    public void AddCounter()
+    {
+        clicked++;
+        clickedText.GetComponent<Text>().text = clicked + "";
+    }
 
 
     private void Awake()
@@ -107,7 +139,7 @@ public class HomeManager : MonoBehaviour
         //CreateScriptableObjectsFromLiedjes();
 
         //audioSource.clip = songs[0].song;
-        Debug.Log("");
+        UnityEngine.Debug.Log("");
         //audioSource.Play();
 
     }
@@ -140,9 +172,14 @@ public class HomeManager : MonoBehaviour
         if (started == false)
         {
             //SPELVORM
-            spelImage1.transform.localPosition = Vector3.Lerp(new Vector2(-1600, 0), new Vector2(1200, 0), Mathf.PingPong(Time.time * 0.2f, 1.0f));
-            spelImage2.transform.localPosition = Vector3.Lerp(new Vector2(1600, 200), new Vector2(-1600, 200), Mathf.PingPong(Time.time * 0.2f, 1.0f));
-            spelImage3.transform.localPosition = Vector3.Lerp(new Vector2(0, -1200), new Vector2(0, 1200), Mathf.PingPong(Time.time * 0.05f, 1.0f));
+            spelImage1.transform.localPosition = Vector3.Lerp(new Vector2(-1600, -200), new Vector2(1200, 0), Mathf.PingPong(Time.time * 0.2f, 1.0f));
+            //spelImage1.transform.localPosition = Vector3.Lerp(new Vector2(0, -1600), new Vector2(0, 1200), Mathf.PingPong(Time.time * 0.2f, 1.0f));
+
+            spelImage2.transform.localPosition = Vector3.Lerp(new Vector2(1600, 200), new Vector2(-1600, 0), Mathf.PingPong(Time.time * 0.2f, 1.0f));
+            //spelImage2.transform.localPosition = Vector3.Lerp(new Vector2(200, 1600), new Vector2(200, -1600), Mathf.PingPong(Time.time * 0.2f, 1.0f));
+
+            spelImage3.transform.localPosition = Vector3.Lerp(new Vector2(300, -1200), new Vector2(-300, 1200), Mathf.PingPong(Time.time * 0.05f, 1.0f));
+            //spelImage3.transform.localPosition = Vector3.Lerp(new Vector2(-1200, 0), new Vector2(1200, 0), Mathf.PingPong(Time.time * 0.05f, 1.0f));
 
 
             started = true;
@@ -151,6 +188,9 @@ public class HomeManager : MonoBehaviour
 
     public void DisableGameUI()
     {
+        clickedText.SetActive(false);
+        clicked = 0;
+        clickedText.GetComponent<Text>().text = clicked + "";
         imageLeft.SetActive(true);
         imageRight.SetActive(true);
         buttonLeft.SetActive(true);
@@ -165,6 +205,7 @@ public class HomeManager : MonoBehaviour
 
     public void EnableGameUI()
     {
+        clickedText.SetActive(true);
         imageLeft.SetActive(false);
         imageRight.SetActive(false);
         buttonLeft.SetActive(false);
@@ -182,7 +223,7 @@ public class HomeManager : MonoBehaviour
 
     public void PlaySongLeft()
     {
-        Debug.Log("Play Left");
+        UnityEngine.Debug.Log("Play Left");
 
         PlaySound(songs[indexInList].song);
         selectedSong = songs[indexInList];
@@ -191,7 +232,7 @@ public class HomeManager : MonoBehaviour
 
     public void PlaySongRight()
     {
-        Debug.Log("Play Right");
+        UnityEngine.Debug.Log("Play Right");
         PlaySound(songs[indexInList + 1].song);
         selectedSong = songs[indexInList + 1];
         EnableGameUI();
@@ -227,7 +268,7 @@ public class HomeManager : MonoBehaviour
     {
         audioSource.clip = buttonEffectClip;
         audioSource.Play();
-        Debug.Log("Go left in list");
+        UnityEngine.Debug.Log("Go left in list");
         if (indexInList == 0 || indexInList == 1)
         {
             //EVEN en index 0
@@ -252,7 +293,7 @@ public class HomeManager : MonoBehaviour
     {
         audioSource.clip = buttonEffectClip;
         audioSource.Play();
-        Debug.Log("Go right in list");
+        UnityEngine.Debug.Log("Go right in list");
         if (indexInList == songs.Count - 1 || indexInList == songs.Count - 2)
         {
             indexInList = 0;

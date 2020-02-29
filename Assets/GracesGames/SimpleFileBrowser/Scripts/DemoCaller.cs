@@ -12,13 +12,13 @@ namespace GracesGames.SimpleFileBrowser.Scripts
     // Able to save and load files containing serialized data (e.g. text)
     public class DemoCaller : MonoBehaviour
     {
-
+        public ToasterScript toaster = new ToasterScript();
         string[] temporaryFilesPath = new string[4];
-        private int imageCounter = 1;
+        string[] stringArray = new string[4];
 
         // Use the file browser prefab
         private string homeFolder;
-           
+
         public GameObject FileBrowserPrefab;
 
         // Define a file extension
@@ -34,6 +34,8 @@ namespace GracesGames.SimpleFileBrowser.Scripts
         private string _textToSave;
 
         public bool PortraitMode;
+
+        public Button saveButton;
 
         public int selectedImage;
         private void Awake()
@@ -54,6 +56,13 @@ namespace GracesGames.SimpleFileBrowser.Scripts
             }
         }
 
+        private void Update()
+        {
+            if ((!temporaryFilesPath[0].Equals("") && !temporaryFilesPath[1].Equals("") && !temporaryFilesPath[2].Equals("") && !temporaryFilesPath[3].Equals("")) && saveButton.interactable == false)
+            {
+                saveButton.interactable = true;
+            }
+        }
         // Updates the text to save with the new input (current text in input field)
         public void UpdateTextToSave(string text)
         {
@@ -111,9 +120,9 @@ namespace GracesGames.SimpleFileBrowser.Scripts
                 Guid random = Guid.NewGuid();
                 string folder = homeFolder + "/" + random.ToString();
                 System.IO.Directory.CreateDirectory(folder);
-                for(int i = 0; i < temporaryFilesPath.Length; i++) 
-                { 
-                   
+                for (int i = 0; i < temporaryFilesPath.Length; i++)
+                {
+
                     char[] del = { '/', '\\' };
                     string[] file = temporaryFilesPath[i].Split(del);
                     if (i == 1)
@@ -125,6 +134,12 @@ namespace GracesGames.SimpleFileBrowser.Scripts
                         File.Copy(temporaryFilesPath[i], folder + '/' + selectedImage + file[file.Length - 1]);
                     }
                 }
+                //GEDAAN MET SAVEN CLEAR LIST
+                stringArray = new string[4];
+                temporaryFilesPath = new string[4];
+                _loadedText.GetComponent<Text>().text = "Muziek: " + stringArray[0] + " \nMenuItem: " + stringArray[1] + " \nAfbeelding 1: " + stringArray[2] + " \nAfbeelding 2: " + stringArray[3];
+                toaster.showToast("Nieuw lied is toegevoegd!", 2);
+                saveButton.interactable = false;
             }
             else
             {
@@ -147,7 +162,18 @@ namespace GracesGames.SimpleFileBrowser.Scripts
                 // We're done working with the file so we can close it
 
                 // Set the LoadedText with the value of the file=
-                _loadedText.GetComponent<Text>().text = "Loaded data: \n" + temporaryFilesPath[0] + " \n" +  temporaryFilesPath[1]+ " \n " +   temporaryFilesPath[2];
+
+
+
+                char[] del = { '/', '\\' };
+                string[] splitFile = temporaryFilesPath[selectedImage].Split(del);
+                stringArray[selectedImage] = splitFile[splitFile.Length - 1];
+
+
+
+
+                _loadedText.GetComponent<Text>().text = "Muziek: " + stringArray[0] + " \nMenuItem: " + stringArray[1] + " \nAfbeelding 1: " + stringArray[2] + " \nAfbeelding 2: " + stringArray[3];
+                
             }
             else
             {

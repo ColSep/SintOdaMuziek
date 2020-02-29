@@ -16,11 +16,15 @@ public class ShakeSpellImage : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip soundFeedbackClip;
 
+    public HomeManager homeManager;
+
     void Awake()
     {
         audioSource = this.gameObject.GetComponent<AudioSource>();
         audioSource.clip = soundFeedbackClip;
         GameObjectToShake = this.gameObject;
+
+
     }
 
     IEnumerator shakeGameObjectCOR(GameObject objectToShake, float totalShakeDuration, float decreasePoint, bool objectIs2D = false)
@@ -128,6 +132,7 @@ public class ShakeSpellImage : MonoBehaviour
 
     public void ImagePress()
     {
+        homeManager.AddCounter();
         /*
         if (!audioSource.isPlaying)
         {
